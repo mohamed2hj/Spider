@@ -18,11 +18,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # دي الخطوة السحرية: إجبار السيرفر يستخدم Gradle 8.2 بدل 9.5
+      # قمنا بإلغاء التخزين المؤقت (cache: false) عشان نتجنب المشكلة التقنية
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.2'
+          cache-read-only: true
+          cache-write-only: false
 
       - name: Build with Gradle
         run: gradle -p app assembleDebug
