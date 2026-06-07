@@ -18,8 +18,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # تحميل الجرادل عشان نتأكد إنه موجود وميتعطلش
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+
+      # تنفيذ البناء مباشرة على مجلد الـ app
       - name: Build with Gradle
-        # سنستخدم gradle مباشرة بدون الحاجة لـ ./gradlew
         run: gradle -p app assembleDebug
 
       - name: Upload APK
