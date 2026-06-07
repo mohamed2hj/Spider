@@ -18,9 +18,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # دي الخطوة السحرية: إجبار السيرفر يستخدم Gradle 8.2 بدل 9.5
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.2'
+
       - name: Build with Gradle
-        # شيلنا أي حاجة بتدور على gradlew
-        # بنستخدم أمر gradle مباشر للـ app
         run: gradle -p app assembleDebug
 
       - name: Upload APK
