@@ -15,7 +15,12 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
     
-    - name: Build debug APK
+    - name: Check files
+      run: |
+        ls -la
+        ls -la app
+    
+    - name: Build APK
       run: |
         cd app
         chmod +x gradlew
