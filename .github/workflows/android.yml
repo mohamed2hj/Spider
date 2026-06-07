@@ -19,6 +19,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
+        # نستخدم gradle المثبت في السيرفر مباشرة دون الاعتماد على ./gradlew
         run: gradle -p app assembleDebug
 
       - name: Upload APK
