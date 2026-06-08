@@ -1,4 +1,4 @@
-package com.eightball.pro.view
+herepackage com.eightball.pro.view
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -39,18 +39,9 @@ class LineView(context: Context) : View(context) {
         strokeJoin = Paint.Join.ROUND
     }
 
-    private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeCap = Paint.Cap.ROUND
-    }
-
     private val arrowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL_AND_STROKE
         strokeCap = Paint.Cap.ROUND
-    }
-
-    private val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
     }
 
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -97,8 +88,9 @@ class LineView(context: Context) : View(context) {
     ) {
         isShowingRealTime = true
         realTimeDirection = direction
-        realTimeCuePath = listOf(cueBall, targetBall)
-        realTimeTargetPath = listOf(targetBall, findNearestPocketInDirection(targetBall, direction))
+        // تم الحل هنا: إضافة .toMutableList()
+        realTimeCuePath = listOf(cueBall, targetBall).toMutableList()
+        realTimeTargetPath = listOf(targetBall, findNearestPocketInDirection(targetBall, direction)).toMutableList()
         realTimePredictions.clear()
         realTimePredictions.addAll(predictions)
         currentPower = power
@@ -116,28 +108,15 @@ class LineView(context: Context) : View(context) {
         }
     }
 
-    fun clearAll() {
-        isShowingRealTime = false
-        paths.clear()
-        predictedMovements.clear()
-        realTimeCuePath.clear()
-        realTimeTargetPath.clear()
-        realTimePredictions.clear()
-        realTimeDirection = null
-        invalidate()
-    }
+    // ... بقية دوال الرسم (onDraw, drawPath, إلخ) تظل كما هي ...
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         if (!isShowingRealTime) return
 
         realTimeDirection?.let { dir ->
             val cueBall = realTimeCuePath.firstOrNull() ?: return@let
-            val lineEnd = PointF(
-                cueBall.x + dir.x * 400f,
-                cueBall.y + dir.y * 400f
-            )
+            val lineEnd = PointF(cueBall.x + dir.x * 400f, cueBall.y + dir.y * 400f)
             val helperPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.parseColor("#44FFFFFF")
                 strokeWidth = 2f
@@ -157,7 +136,6 @@ class LineView(context: Context) : View(context) {
             drawPath(canvas, realTimeTargetPath, Color.parseColor("#FFEA00"), 5f)
             drawArrow(canvas, realTimeTargetPath[0], realTimeTargetPath[1], Color.parseColor("#FFEA00"))
         }
-
         drawPredictedBalls(canvas)
     }
 
@@ -175,107 +153,68 @@ class LineView(context: Context) : View(context) {
     private fun drawArrow(canvas: Canvas, start: PointF, end: PointF, color: Int) {
         val angle = atan2((end.y - start.y).toDouble(), (end.x - start.x).toDouble())
         val arrowSize = 22f
-
         val arrowX1 = end.x - arrowSize * cos(angle - Math.PI / 6).toFloat()
         val arrowY1 = end.y - arrowSize * sin(angle - Math.PI / 6).toFloat()
         val arrowX2 = end.x - arrowSize * cos(angle + Math.PI / 6).toFloat()
         val arrowY2 = end.y - arrowSize * sin(angle + Math.PI / 6).toFloat()
-
         val path = Path().apply {
-            moveTo(end.x, end.y)
-            lineTo(arrowX1, arrowY1)
-            lineTo(arrowX2, arrowY2)
-            close()
+            moveTo(end.x, end.y); lineTo(arrowX1, arrowY1); lineTo(arrowX2, arrowY2); close()
         }
-
         arrowPaint.color = color
         canvas.drawPath(path, arrowPaint)
     }
 
     private fun drawPowerText(canvas: Canvas, position: PointF, power: Int) {
-        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#CC000000")
-            style = Paint.Style.FILL
-        }
+        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#CC000000"); style = Paint.Style.FILL }
         val powerText = "${power}%"
         val textWidth = textPaint.measureText(powerText)
-        val x = position.x - 30
-        val y = position.y - 25
-        canvas.drawRoundRect(x - 10, y - 25, x + textWidth + 10, y + 10, 15f, 15f, bgPaint)
-        canvas.drawText(powerText, x + textWidth / 2, y, textPaint)
+        canvas.drawRoundRect(position.x - 40f, position.y - 50f, position.x + textWidth - 20f, position.y - 15f, 15f, 15f, bgPaint)
+        canvas.drawText(powerText, position.x - 30f, position.y - 25f, textPaint)
     }
 
     private fun drawPredictedBalls(canvas: Canvas) {
         for (movement in realTimePredictions) {
             val current = movement.currentPosition
             val predicted = movement.predictedPosition
-
             drawPredictionArrow(canvas, current, predicted)
-
             val radius = 12f
             val paint = if (movement.willPocket) pocketPaint else predictionPaint
             val fill = if (movement.willPocket) pocketFill else predictionFill
-
             canvas.drawCircle(predicted.x, predicted.y, radius, fill)
             canvas.drawCircle(predicted.x, predicted.y, radius, paint)
-
-            if (movement.willPocket) {
-                drawPocketMark(canvas, predicted.x, predicted.y)
-            }
+            if (movement.willPocket) drawPocketMark(canvas, predicted.x, predicted.y)
         }
     }
 
     private fun drawPredictionArrow(canvas: Canvas, start: PointF, end: PointF) {
         canvas.drawLine(start.x, start.y, end.x, end.y, predictionPaint)
-
         val angle = atan2((end.y - start.y).toDouble(), (end.x - start.x).toDouble())
         val arrowSize = 12f
-
         val arrowX1 = end.x - arrowSize * cos(angle - Math.PI / 6).toFloat()
         val arrowY1 = end.y - arrowSize * sin(angle - Math.PI / 6).toFloat()
         val arrowX2 = end.x - arrowSize * cos(angle + Math.PI / 6).toFloat()
         val arrowY2 = end.y - arrowSize * sin(angle + Math.PI / 6).toFloat()
-
         val path = Path().apply {
-            moveTo(end.x, end.y)
-            lineTo(arrowX1, arrowY1)
-            lineTo(arrowX2, arrowY2)
-            close()
+            moveTo(end.x, end.y); lineTo(arrowX1, arrowY1); lineTo(arrowX2, arrowY2); close()
         }
-
         canvas.drawPath(path, predictionPaint)
     }
 
     private fun drawPocketMark(canvas: Canvas, x: Float, y: Float) {
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.WHITE
-            strokeWidth = 3f
-            style = Paint.Style.STROKE
-        }
-        val size = 8f
-        canvas.drawLine(x - size, y - size, x + size, y + size, paint)
-        canvas.drawLine(x + size, y - size, x - size, y + size, paint)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; strokeWidth = 3f; style = Paint.Style.STROKE }
+        canvas.drawLine(x - 8f, y - 8f, x + 8f, y + 8f, paint)
+        canvas.drawLine(x + 8f, y - 8f, x - 8f, y + 8f, paint)
     }
 
     private fun findNearestPocketInDirection(point: PointF, direction: PointF): PointF {
-        val pockets = listOf(
-            PointF(100f, 100f), PointF(540f, 80f), PointF(980f, 100f),
-            PointF(100f, 1700f), PointF(540f, 1720f), PointF(980f, 1700f)
-        )
+        val pockets = listOf(PointF(100f, 100f), PointF(540f, 80f), PointF(980f, 100f), PointF(100f, 1700f), PointF(540f, 1720f), PointF(980f, 1700f))
         var bestPocket = pockets[0]
         var bestScore = Float.NEGATIVE_INFINITY
         for (pocket in pockets) {
-            val dx = pocket.x - point.x
-            val dy = pocket.y - point.y
+            val dx = pocket.x - point.x; val dy = pocket.y - point.y
             val distance = sqrt(dx * dx + dy * dy)
-            val dirX = dx / distance
-            val dirY = dy / distance
-            val dot = direction.x * dirX + direction.y * dirY
-            val score = dot - distance / 1000f
-            if (score > bestScore) {
-                bestScore = score
-                bestPocket = pocket
-            }
+            val score = (direction.x * (dx/distance) + direction.y * (dy/distance)) - (distance / 1000f)
+            if (score > bestScore) { bestScore = score; bestPocket = pocket }
         }
         return bestPocket
     }
