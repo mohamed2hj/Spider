@@ -1,4 +1,4 @@
-herepackage com.eightball.pro
+package com.eightball.pro
 
 import android.app.Activity
 import android.content.Intent
