@@ -1,4 +1,5 @@
-Enter<vector xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
@@ -12,11 +13,9 @@ Enter<vector xmlns:android="http://schemas.android.com/apk/res/android"
         android:fillColor="#FFD700"
         android:pathData="M54,20 L70,50 L54,80 L38,50 Z" />
     
-    <circle
+    <path
         android:fillColor="#00E676"
-        android:cx="54"
-        android:cy="50"
-        android:r="12" />
+        android:pathData="M42,50 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0" />
     
     <path
         android:strokeColor="#FFFFFF"
