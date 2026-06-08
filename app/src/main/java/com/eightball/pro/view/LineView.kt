@@ -88,7 +88,6 @@ class LineView(context: Context) : View(context) {
     ) {
         isShowingRealTime = true
         realTimeDirection = direction
-        // تم الحل هنا: إضافة .toMutableList()
         realTimeCuePath = listOf(cueBall, targetBall).toMutableList()
         realTimeTargetPath = listOf(targetBall, findNearestPocketInDirection(targetBall, direction)).toMutableList()
         realTimePredictions.clear()
@@ -108,7 +107,16 @@ class LineView(context: Context) : View(context) {
         }
     }
 
-    // ... بقية دوال الرسم (onDraw, drawPath, إلخ) تظل كما هي ...
+    fun clearAll() {
+        isShowingRealTime = false
+        paths.clear()
+        predictedMovements.clear()
+        realTimeCuePath.clear()
+        realTimeTargetPath.clear()
+        realTimePredictions.clear()
+        realTimeDirection = null
+        invalidate()
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
