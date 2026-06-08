@@ -1,4 +1,4 @@
-herepackage com.eightball.pro.view
+package com.eightball.pro.view
 
 import android.animation.ValueAnimator
 import android.content.Context
