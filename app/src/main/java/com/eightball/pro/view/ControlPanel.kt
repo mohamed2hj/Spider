@@ -9,7 +9,6 @@ import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import com.eightball.pro.AboutActivity
-import kotlin.random.Random
 
 class ControlPanel(context: Context) : View(context) {
 
@@ -21,8 +20,8 @@ class ControlPanel(context: Context) : View(context) {
 
     private var callback: ControlCallback? = null
 
-    private val buttonSize = 200
-    private val buttonMargin = 25
+    private val buttonSize = 200f
+    private val buttonMargin = 25f
     private val buttonRadius = 35f
 
     private var currentAlpha = 60
@@ -81,15 +80,15 @@ class ControlPanel(context: Context) : View(context) {
     }
 
     private fun setupGradients() {
-        playGradient = LinearGradient(0f, 0f, 0f, buttonSize.toFloat(),
+        playGradient = LinearGradient(0f, 0f, 0f, buttonSize,
             intArrayOf(Color.parseColor("#FF4081"), Color.parseColor("#E91E63")),
             floatArrayOf(0f, 1f), Shader.TileMode.CLAMP)
 
-        stopGradient = LinearGradient(0f, 0f, 0f, buttonSize.toFloat(),
+        stopGradient = LinearGradient(0f, 0f, 0f, buttonSize,
             intArrayOf(Color.parseColor("#FF9800"), Color.parseColor("#F57C00")),
             floatArrayOf(0f, 1f), Shader.TileMode.CLAMP)
 
-        closeGradient = LinearGradient(0f, 0f, 0f, buttonSize.toFloat(),
+        closeGradient = LinearGradient(0f, 0f, 0f, buttonSize,
             intArrayOf(Color.parseColor("#F44336"), Color.parseColor("#D32F2F")),
             floatArrayOf(0f, 1f), Shader.TileMode.CLAMP)
     }
@@ -124,25 +123,23 @@ class ControlPanel(context: Context) : View(context) {
         screenWidth = w
         screenHeight = h
 
-        val startX = screenWidth - (buttonSize * 3 + buttonMargin * 2).toFloat()
-        val y = screenHeight - buttonSize - buttonMargin - 100
+        val startX = screenWidth - (buttonSize * 3f + buttonMargin * 2f)
+        val y = screenHeight - buttonSize - buttonMargin - 100f
 
         playRect = RectF(startX, y, startX + buttonSize, y + buttonSize)
         stopRect = RectF(startX + buttonSize + buttonMargin, y,
-            startX + buttonSize * 2 + buttonMargin, y + buttonSize)
-        closeRect = RectF(startX + (buttonSize + buttonMargin) * 2, y,
-            startX + buttonSize * 3 + buttonMargin * 2, y + buttonSize)
+            startX + buttonSize * 2f + buttonMargin, y + buttonSize)
+        closeRect = RectF(startX + (buttonSize + buttonMargin) * 2f, y,
+            startX + buttonSize * 3f + buttonMargin * 2f, y + buttonSize)
 
-        val infoX = buttonMargin.toFloat()
-        val infoY = screenHeight - 60 - buttonMargin - 100
-        infoRect = RectF(infoX, infoY, infoX + 60, infoY + 60)
+        val infoX = buttonMargin
+        val infoY = screenHeight - 60f - buttonMargin - 100f
+        infoRect = RectF(infoX, infoY, infoX + 60f, infoY + 60f)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         drawGlassBackground(canvas)
-
         drawButton(canvas, playRect, playGradient, "▶", playPaint)
         drawButton(canvas, stopRect, stopGradient, "■", stopPaint)
         drawButton(canvas, closeRect, closeGradient, "✕", closePaint)
@@ -151,13 +148,13 @@ class ControlPanel(context: Context) : View(context) {
             val centerX = rect.centerX()
             val centerY = rect.centerY()
             canvas.drawRoundRect(rect, 30f, 30f, infoPaint)
-            val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            val textPaintInfo = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.WHITE
                 textSize = 32f
                 textAlign = Paint.Align.CENTER
                 typeface = Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD)
             }
-            canvas.drawText("i", centerX, centerY + 12, textPaint)
+            canvas.drawText("i", centerX, centerY + 12f, textPaintInfo)
         }
     }
 
@@ -167,31 +164,29 @@ class ControlPanel(context: Context) : View(context) {
             style = Paint.Style.FILL
         }
         val bgRect = RectF(
-            (playRect?.left ?: 0f) - 20,
-            (playRect?.top ?: 0f) - 20,
-            (closeRect?.right ?: 0f) + 20,
-            (playRect?.bottom ?: 0f) + 60
+            (playRect?.left ?: 0f) - 20f,
+            (playRect?.top ?: 0f) - 20f,
+            (closeRect?.right ?: 0f) + 20f,
+            (playRect?.bottom ?: 0f) + 60f
         )
         canvas.drawRoundRect(bgRect, 50f, 50f, glassPaint)
     }
 
     private fun drawButton(canvas: Canvas, rect: RectF?, gradient: LinearGradient, icon: String, paint: Paint) {
         if (rect == null) return
-
         val cx = rect.centerX()
         val cy = rect.centerY()
-        val radius = rect.width() / 2
-
-        val pulseRadius = radius + 8 * (0.5f + pulseValue * 0.3f)
+        val radius = rect.width() / 2f
+        val pulseRadius = radius + 8f * (0.5f + pulseValue * 0.3f)
+        
         glowPaint.color = when (icon) {
             "▶" -> Color.parseColor("#FF4081")
             "■" -> Color.parseColor("#FF9800")
             else -> Color.parseColor("#F44336")
         }
-        glowPaint.alpha = (100 - pulseValue * 50).toInt()
+        glowPaint.alpha = (100f - pulseValue * 50f).toInt()
         canvas.drawCircle(cx, cy, pulseRadius, glowPaint)
-
-        canvas.drawCircle(cx, cy + 6, radius, shadowPaint)
+        canvas.drawCircle(cx, cy + 6f, radius, shadowPaint)
 
         gradient.setLocalMatrix(Matrix().apply { setTranslate(rect.left, rect.top) })
         paint.shader = gradient
@@ -214,17 +209,16 @@ class ControlPanel(context: Context) : View(context) {
             "■" -> "إيقاف"
             else -> "إغلاق"
         }
-        canvas.drawText(label, cx, rect.bottom + 40, textPaint)
-
+        canvas.drawText(label, cx, rect.bottom + 40f, textPaint)
         canvas.restore()
     }
 
     private fun drawPlayIcon(canvas: Canvas, cx: Float, cy: Float) {
         val size = 45f
         val path = Path().apply {
-            moveTo(cx - size/2, cy - size/1.8f)
+            moveTo(cx - size/2f, cy - size/1.8f)
             lineTo(cx + size/1.8f, cy)
-            lineTo(cx - size/2, cy + size/1.8f)
+            lineTo(cx - size/2f, cy + size/1.8f)
             close()
         }
         canvas.drawPath(path, iconPaint)
@@ -232,13 +226,13 @@ class ControlPanel(context: Context) : View(context) {
 
     private fun drawStopIcon(canvas: Canvas, cx: Float, cy: Float) {
         val size = 35f
-        canvas.drawRect(cx - size/2, cy - size/2, cx + size/2, cy + size/2, iconPaint)
+        canvas.drawRect(cx - size/2f, cy - size/2f, cx + size/2f, cy + size/2f, iconPaint)
     }
 
     private fun drawCloseIcon(canvas: Canvas, cx: Float, cy: Float) {
         val size = 35f
-        canvas.drawLine(cx - size/2, cy - size/2, cx + size/2, cy + size/2, iconPaint)
-        canvas.drawLine(cx + size/2, cy - size/2, cx - size/2, cy + size/2, iconPaint)
+        canvas.drawLine(cx - size/2f, cy - size/2f, cx + size/2f, cy + size/2f, iconPaint)
+        canvas.drawLine(cx + size/2f, cy - size/2f, cx - size/2f, cy + size/2f, iconPaint)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -250,11 +244,9 @@ class ControlPanel(context: Context) : View(context) {
             MotionEvent.ACTION_UP -> {
                 scaleFactor = 1f
                 invalidate()
-
                 highlightButtons()
                 val x = event.x
                 val y = event.y
-
                 when {
                     playRect?.contains(x, y) == true && !isProcessing -> {
                         isProcessing = true
